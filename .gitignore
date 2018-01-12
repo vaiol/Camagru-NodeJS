@@ -1,0 +1,12 @@
+#PHPStorm
+CMakeLists.txt
+cmake-build-debug/
+.idea/
+
+#MacOS
+.DS_Store
+._.DS_Store
+._*
+
+#Project
+photos/

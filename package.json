@@ -1,0 +1,28 @@
+{
+  "name": "camagru",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "dev": "nodemon server.js"
+  },
+  "parser": "babel-eslint",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vaiol/Camagru-NodeJS.git"
+  },
+  "author": "astepano",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/vaiol/Camagru-NodeJS/issues"
+  },
+  "homepage": "https://github.com/vaiol/Camagru-NodeJS#readme",
+  "dependencies": {
+    "body-parser": "^1.18.2",
+    "express": "^4.16.2",
+    "mongodb": "^3.0.1"
+  },
+  "devDependencies": {
+    "nodemon": "^1.14.11"
+  }
+}
