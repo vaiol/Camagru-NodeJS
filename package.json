@@ -19,8 +19,12 @@
   "homepage": "https://github.com/vaiol/Camagru-NodeJS#readme",
   "dependencies": {
     "body-parser": "^1.18.2",
+    "connect-redis": "^3.3.3",
     "express": "^4.16.2",
-    "mongodb": "^3.0.1"
+    "express-session": "^1.15.6",
+    "hiredis": "^0.5.0",
+    "mongodb": "^3.0.1",
+    "redis": "^2.8.0"
   },
   "devDependencies": {
     "nodemon": "^1.14.11"

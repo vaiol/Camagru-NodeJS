@@ -2,7 +2,6 @@ const minPassLen = 6;
 const maxPassLen = 256;
 const minLoginLen = 4;
 const maxLoginLen = 30;
-const minEmailLen = 3;
 const maxEmailLen = 256;
 
 function validateEmail(email) {
@@ -21,34 +20,38 @@ function hash(pass) {
 
 module.exports = function(app, db) {
     const collection = db.collection('users');
+
     app.post('/user', (req, res) => {
         //user registration
         const login = req.body.login;
         const email = req.body.email;
-        const pass1 = req.body.pass1;
-        const pass2 = req.body.pass2;
+        const password = req.body.password;
 
-        if (!login || login.length < minLoginLen) {
-            return res.send({ 'code': 2, 'message': 'minimum login length is '+minLoginLen+' symbols' });
+        if (!login || !email || !password) {
+            return res.send({ code: 2, message: "some field is empty (login|email|password)" });
+        } else if (login.length < minLoginLen) {
+            return res.send({ 'code': 30, 'message': 'minimum login length is '+minLoginLen+' symbols' });
         } else if (login.length > maxLoginLen) {
-            return res.send({ 'code': 3, 'message': 'maximum login length is '+maxLoginLen+' symbols' });
-        } else if (!email || email.length < minEmailLen) {
-            return res.send({ 'code': 4, 'message': 'minimum email length is '+minEmailLen+' symbols' });
+            return res.send({ 'code': 31, 'message': 'maximum login length is '+maxLoginLen+' symbols' });
         } else if (email.length > maxEmailLen) {
-            return res.send({ 'code': 5, 'message': 'maximum email length is '+maxEmailLen+' symbols' });
+            return res.send({ 'code': 32, 'message': 'maximum email length is '+maxEmailLen+' symbols' });
+        } else if (password.length < minPassLen) {
+            return res.send({ 'code': 33, 'message': 'minimum password length is '+minPassLen+' symbols' });
+        } else if (password.length > maxPassLen) {
+            return res.send({ 'code': 34, 'message': 'maximum password length is '+maxPassLen+' symbols' });
         } else if (!validateEmail(email)) {
-            return res.send({ 'code': 6, 'message': 'email is not valid' });
-        } else if (!pass1 || !pass2 || pass1 !== pass2) {
-            return res.send({ 'code': 7, 'message': 'passwords did not match' });
-        } else if (pass1.length < minPassLen) {
-            return res.send({ 'code': 8, 'message': 'minimum password length is '+minPassLen+' symbols' });
-        } else if (pass1.length > maxPassLen) {
-            return res.send({ 'code': 9, 'message': 'maximum password length is '+maxPassLen+' symbols' });
+            return res.send({ 'code': 20, 'message': 'email is not valid' });
         }
 
+        const user = {
+            login: login,
+            email: email,
+            password: hash(password),
+            notification: true,
+            activated: false,
+            code: randomString(12)
+        };
 
-
-        const user = { login: login, email: email, password: hash(pass1), notification: true, activated: false, code: randomString(12) };
         collection.insertOne(user).then(function (result) {
             // sendMail();
             res.send(result.ops[0]);
@@ -68,7 +71,8 @@ module.exports = function(app, db) {
         });
 
     });
-    app.put('/user', (req, res) => {
+
+    app.post('/user/email', (req, res) => {
         //user email confirmation
         const code = req.body.code;
         if (!code) {
@@ -84,7 +88,8 @@ module.exports = function(app, db) {
             res.send({ 'code': err.code, 'message': err.errmsg });
         });
     });
-    app.post('/user/pass', (req, res) => {
+
+    app.post('/user/password', (req, res) => {
         //initiate user password restore process
         const user = req.body.user;
         if (!user) {
@@ -101,24 +106,28 @@ module.exports = function(app, db) {
             res.send({ 'code': err.code, 'message': err.errmsg });
         });
     });
-    app.put('/user/pass', (req, res) => {
+
+    app.put('/user/password', (req, res) => {
         //finish user password restore process
         const user = req.body.user;
         const code = req.body.code;
-        const pass1 = req.body.pass1;
-        const pass2 = req.body.pass2;
+        const password = req.body.password;
 
-        if (!user || !code || !pass1 || !pass2) {
+        if (!user || !code || !password) {
             return res.send({ code: 2, message: "some field is empty" });
-        } else if (pass1 !== pass2) {
-            return res.send({ 'code': 7, 'message': 'passwords did not match' });
-        } else if (pass1.length < minPassLen) {
-            return res.send({ 'code': 8, 'message': 'minimum password length is '+minPassLen+' symbols' });
-        } else if (pass1.length > maxPassLen) {
-            return res.send({ 'code': 9, 'message': 'maximum password length is '+maxPassLen+' symbols' });
+        } else if (password.length < minPassLen) {
+            return res.send({ 'code': 33, 'message': 'minimum password length is '+minPassLen+' symbols' });
+        } else if (password.length > maxPassLen) {
+            return res.send({ 'code': 34, 'message': 'maximum password length is '+maxPassLen+' symbols' });
         }
 
-        collection.updateOne({$and: [{code: code}, {$or: [ { email: user }, { login: user} ] }]}, { $set: { code: null, password: hash(pass1) }}).then(function(info) {
+        const filter = {
+            $and: [
+                { code: code },
+                { $or: [ { email: user }, { login: user} ] }
+            ]
+        };
+        collection.updateOne(filter, { $set: { code: null, password: hash(password) }}).then(function(info) {
             if (info.result.nModified) {
                 res.send({ code: 1, message: "password changed successful for user '"+user+"'" });
             } else {
