@@ -2,7 +2,7 @@
   "name": "camagru",
   "version": "1.0.0",
   "description": "",
-  "main": "app/server.js",
+  "main": "app/app.js",
   "scripts": {
     "dev": "nodemon server.js"
   },
