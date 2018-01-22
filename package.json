@@ -2,9 +2,9 @@
   "name": "camagru",
   "version": "1.0.0",
   "description": "",
-  "main": "app/app.js",
+  "main": "app/app.mjs",
   "scripts": {
-    "dev": "nodemon server.js"
+    "dev": "nodemon --experimental-modules app/app.mjs"
   },
   "parser": "babel-eslint",
   "repository": {

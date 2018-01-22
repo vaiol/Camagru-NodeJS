@@ -142,14 +142,14 @@ module.exports = function(app, db) {
 
 
 
-const express = require('express');
-const auth = require('../middlewares/auth');
-const userdb = require('../models/user');
-
-const router = express.Router();
-
-router.post('/user', function(req, res) {
-
-});
-
-module.exports = router;
+// const express = require('express');
+// const auth = require('../middlewares/auth');
+// const userdb = require('../models/user');
+//
+// const router = express.Router();
+//
+// router.post('/user', function(req, res) {
+//
+// });
+//
+// module.exports = router;
